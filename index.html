@@ -1,0 +1,249 @@
+<!-- ============================================ -->
+<!-- FILE: index.html (FINAL - with Translations)  -->
+<!-- SIMPAN DI: quiz-engine/                       -->
+<!-- ============================================ -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="特定技能2号 製造分野 評価試験 学習ツール">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>BOEDAKBOLOHO | 製造分野 特定技能2号 対策</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            jp: ['Noto Sans JP', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+              400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+              800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+            },
+            accent: {
+              50: '#fef2f2', 100: '#fee2e2', 400: '#f87171', 500: '#ef4444',
+              600: '#dc2626', 700: '#b91c1c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+  <!-- Kuromoji.js -->
+  <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.min.js" defer></script>
+
+  <!-- Dexie.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js" defer></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-jp { font-family: 'Noto Sans JP', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .header-gradient {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 30%, #312e81 70%, #1e1b4b 100%);
+      position: relative; overflow: hidden;
+    }
+    .header-gradient::before {
+      content: ''; position: absolute; top: -50%; right: -20%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .header-gradient::after {
+      content: ''; position: absolute; bottom: -30%; left: -10%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .nav-container {
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(226,232,240,0.8);
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .nav-btn {
+      color: #64748b; font-weight: 500; font-size: 0.875rem;
+      padding: 0.625rem 1rem; border-radius: 0.75rem;
+      transition: all 0.2s; white-space: nowrap; cursor: pointer;
+      border: none; background: transparent;
+      display: flex; align-items: center; gap: 0.375rem;
+    }
+    .nav-btn:hover { color: #312e81; background: #eef2ff; }
+    .nav-btn.active {
+      color: #fff; background: linear-gradient(135deg, #4f46e5, #6366f1);
+      box-shadow: 0 4px 12px rgba(79,70,229,0.3); font-weight: 600;
+    }
+    .stat-card {
+      background: #fff; border-radius: 1rem; padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+    .main-card {
+      background: #fff; border-radius: 1.25rem; padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #f1f5f9;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      padding: 0.25rem 0.75rem; border-radius: 9999px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff;
+      padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600;
+      border: none; cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.35); }
+    .image-placeholder {
+      border: 2px dashed #e2e8f0; background: #f8fafc;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; cursor: pointer; min-height: 160px;
+      color: #94a3b8; border-radius: 1rem; gap: 0.5rem; transition: all 0.3s;
+    }
+    .image-placeholder:hover { border-color: #818cf8; background: #eef2ff; color: #4f46e5; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.5s ease both; }
+    .animate-delay-1 { animation-delay: 0.1s; }
+    .animate-delay-2 { animation-delay: 0.2s; }
+    .animate-delay-3 { animation-delay: 0.3s; }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(99,102,241,0); }
+    }
+    .pulse-glow { animation: pulse-glow 2s infinite; }
+    .view { display: none; }
+    .view.active { display: block; }
+    @media (max-width: 640px) {
+      .stat-card { padding: 1rem; }
+      .main-card { padding: 1.25rem; }
+      .nav-btn { font-size: 0.75rem; padding: 0.5rem 0.625rem; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+  <!-- HEADER -->
+  <header class="header-gradient text-white py-5 px-4 relative z-10">
+    <div class="container mx-auto max-w-5xl">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 md:w-14 md:h-14 bg-white/15 backdrop-blur rounded-2xl flex items-center justify-center text-2xl md:text-3xl shadow-lg pulse-glow">⚙️</div>
+          <div>
+            <h1 class="text-xl md:text-3xl font-extrabold tracking-tight leading-tight">BOEDAKBOLOHO</h1>
+            <p class="text-xs md:text-sm text-indigo-200/90 mt-0.5 font-jp font-medium tracking-wide">特定技能2号 製造分野 評価試験 学習ツール</p>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center gap-3">
+          <span class="badge badge-success text-xs" id="status-badge"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online</span>
+          <span class="text-xs text-indigo-300/70 font-mono">v1.0.0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION -->
+  <nav class="nav-container">
+    <div class="container mx-auto max-w-5xl px-3">
+      <div class="flex overflow-x-auto gap-0.5 py-2 scrollbar-hide">
+        <button onclick="navigateTo('dashboard')" class="nav-btn active" data-view="dashboard"><i class="fas fa-chart-pie text-xs"></i> Dashboard</button>
+        <button onclick="navigateTo('practice')" class="nav-btn" data-view="practice"><i class="fas fa-book-open text-xs"></i> Latihan</button>
+        <button onclick="navigateTo('exam')" class="nav-btn" data-view="exam"><i class="fas fa-clock text-xs"></i> Ujian</button>
+        <button onclick="navigateTo('review')" class="nav-btn" data-view="review"><i class="fas fa-rotate text-xs"></i> Ulang</button>
+        <button onclick="navigateTo('glossary')" class="nav-btn" data-view="glossary"><i class="fas fa-book text-xs"></i> Glosarium</button>
+        <button onclick="navigateTo('settings')" class="nav-btn" data-view="settings"><i class="fas fa-sliders-h text-xs"></i> Setting</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="container mx-auto max-w-5xl px-4 py-6 md:py-8" id="main-content">
+    <div id="view-dashboard" class="view active"></div>
+    <div id="view-practice" class="view"></div>
+    <div id="view-exam" class="view"></div>
+    <div id="view-review" class="view"></div>
+    <div id="view-glossary" class="view"></div>
+    <div id="view-settings" class="view"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 bg-white/50 mt-12 py-6">
+    <div class="container mx-auto max-w-5xl px-4 text-center">
+      <p class="text-slate-500 text-sm font-medium">⚙️ <strong>BOEDAKBOLOHO</strong><span class="font-jp text-xs ml-2">— 特定技能2号 製造分野 評価試験 対策 —</span></p>
+      <p class="text-slate-400 text-xs mt-1">Dibuat untuk pembelajaran mandiri. Ganbatte kudasai! 🇯🇵✨</p>
+    </div>
+  </footer>
+
+  <!-- SERVICE WORKER -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('✅ SW registered'))
+          .catch(err => console.log('❌ SW failed'));
+      });
+    }
+  </script>
+
+  <!-- TEMP NAVIGATION -->
+  <script>
+    function navigateTo(viewName) {
+      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector(`[data-view="${viewName}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+  </script>
+
+  <!-- ========== ALL SCRIPTS (ORDER MATTERS) ========== -->
+  <script src="js/storage.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/translations.js" defer></script>
+  <script src="js/furigana.js" defer></script>
+  <script src="js/app.js" defer></script>
+
+</body>
+</html>
